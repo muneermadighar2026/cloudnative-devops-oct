@@ -1,0 +1,27 @@
+version: 0.2
+
+env:
+  variables:
+    TAG: "latest"
+
+  parameter-store:
+    DOCKER_USER: "/lab8/docker-hub/username"
+    DOCKER_PASS: "/lab8/docker-hub/password"
+    URL: "/lab8/docker-hub/url"
+    REPO_NAME: "/lab8/docker-hub/reponame"
+
+phases:
+  pre_build:
+    commands:
+      - echo "login to docker registry"
+      - echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+
+  build:
+    commands:
+      - echo "build docker image"
+      - docker build -t $DOCKER_USER/$REPO_NAME:$TAG .
+
+  post_build:
+    commands:
+      - echo "push docker image to registry"
+      - docker push $DOCKER_USER/$REPO_NAME:$TAG
